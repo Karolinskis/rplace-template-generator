@@ -14,6 +14,8 @@ pip install PIL
 
 Rename all templates starting coordinates
 
+Default directory: templates/
+
 Example : 256-256.png
 
 ## Contributing
