@@ -1,19 +1,37 @@
-from asyncio.windows_events import NULL
-from turtle import width
 from PIL import Image
+from os import listdir
+from os.path import isfile, join
+
+# Script created by Karolinskis
+# r/place template maker
+# 2022-04-02
+
+# Global constants
+# r/place canvas size
+TEMPLATES_DIR = "templates"
+RESULT_DIR = "result.png"
+PLACE_X = 2000*3
+PLACE_Y = 1000*3
+
 
 # Creates a new transparent canvas
-def NewCanvas(destination):
-    base = Image.new('RGBA', (3000, 3000))
-    base.save(destination, "PNG")
+def NewCanvas(dest_src):
+    base = Image.new('RGBA', (PLACE_X, PLACE_Y))
+    base.save(dest_src, "PNG")
     return base
 
+# Finds all file names of templates in *templates_src*
+def ReadTemplates(templates_dir):
+    images = []
+    images = [f for f in listdir(templates_dir) if isfile(join(templates_dir, f))]
+    return images
+
+
 # Draws template on existing canvas
-def DrawTemplate(base, addition, start_x, start_y) :
-    if(base == " " or base == NULL or base == ""):
-        base = Image.new('RGBA', (3000, 3000)) 
-    else:
-        base = Image.open(base)
+def DrawTemplate(base_src, addition, start_x, start_y) :
+    base = Image.new('RGBA', (PLACE_X, PLACE_Y))  
+        
+    #base = Image.open(base_src)
 
     add = Image.open(addition,'r')
     add_val = list(add.getdata())
@@ -25,47 +43,38 @@ def DrawTemplate(base, addition, start_x, start_y) :
             base.putpixel((start_x + x*3,start_y + y*3), (add_val[i]))
             i = i+1
 
-            
-    base.save('result.png')
-    base.show()
+    base.save("result.png")
     return base
 
-# coords of template
-start_x = 363
-start_y = 645
-base = " "
-addition = " "
+# Main
+print("Canvas to add to:")
+print("Leave empty to create a new canvas")
+base_src = input()
 
 
+print("Directory to read templates from \n Default: /templates")
+templates_dir = input()
 
-print("1 to create on blank canvas")
-print("2 to draw on existing canvas")
-draw_mode = input()
-
-if(int(draw_mode) == 1):
-    base = NewCanvas("blankcanvas.png")
-    base.show()
-
-if(int(draw_mode) == 2):
-    print("Start x coords of art:")
-    start_x = input()
-    start_x = int(start_x)
-
-    print("Start y coords of art:")
-    start_y = input()
-    start_y = int(start_y)
-
-    print(start_y)
-
-    print("Canvas to add to:")
-    print("Leave empty to create a new canvas")
-    base = input()
-
-    print("Image to add:")
-    addition = input()
-    addition = str(addition)
-
-    DrawTemplate(base, addition, start_x*3+1, start_y*3+1)
+if (templates_dir == "" or templates_dir == " ") :
+    templates_dir = TEMPLATES_DIR
 
 
+print("Reading...")
 
+if(templates_dir == " " or templates_dir == "") :
+    templates_dir = TEMPLATES_DIR
+
+templates_dirs = ReadTemplates(templates_dir)
+    
+print("Completed!" + "\nFound " + str(len(templates_dirs)) + " templates")
+
+
+for template_dir_i in templates_dirs:
+    print("Populating canvas...")
+    xy = template_dir_i.split('-')
+    x_src = int(xy[0])
+    y_src = int(xy[1].split('.')[0])
+    full_templates_dir = templates_dir + "/" + template_dir_i
+    template = DrawTemplate(RESULT_DIR, full_templates_dir, x_src*3+1, y_src*3+1)
+
+template.show()
