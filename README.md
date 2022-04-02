@@ -1,4 +1,4 @@
-# r/place Baltic States
+# r/place Template Generator
 
 Python generator to create templates for r/place
 
